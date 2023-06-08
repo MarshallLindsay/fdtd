@@ -383,6 +383,7 @@ class PlaneSource:
 
         profile = bd.ones(_xvec.shape)
         self.profile = self.amplitude * profile
+        #from IPython import embed; embed()
 
     def _handle_slices(
         self, x: ListOrSlice, y: ListOrSlice, z: ListOrSlice

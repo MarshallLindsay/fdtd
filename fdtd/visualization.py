@@ -142,17 +142,22 @@ def visualize(
         raise ValueError("Visualization only works for 2D grids")
 
     for source in grid.sources:
+        render_source = False
         if isinstance(source, LineSource):
             if x is not None:
+                if x in source.x: render_source = True
                 _x = [source.y[0], source.y[-1]]
                 _y = [source.z[0], source.z[-1]]
             elif y is not None:
+                if y in source.y: render_source = True
                 _x = [source.z[0], source.z[-1]]
                 _y = [source.x[0], source.x[-1]]
             elif z is not None:
+                if z in source.z: render_source = True
                 _x = [source.x[0], source.x[-1]]
                 _y = [source.y[0], source.y[-1]]
-            plt.plot(_y, _x, lw=3, color=srccolor)
+            if render_source:
+                plt.plot(_y, _x, lw=3, color=srccolor)
         elif isinstance(source, PointSource):
             if x is not None:
                 _x = source.y
@@ -167,6 +172,7 @@ def visualize(
             grid_energy[_x, _y] = 0  # do not visualize energy at location of source
         elif isinstance(source, PlaneSource):
             if x is not None:
+                if x in range(source.x.start, source.x.stop): render_source = True
                 _x = (
                     source.y
                     if source.y.stop > source.y.start + 1
@@ -178,6 +184,7 @@ def visualize(
                     else slice(source.z.start, source.z.start)
                 )
             elif y is not None:
+                if y in range(source.y.start, source.y.stop): render_source = True
                 _x = (
                     source.z
                     if source.z.stop > source.z.start + 1
@@ -189,6 +196,7 @@ def visualize(
                     else slice(source.x.start, source.x.start)
                 )
             elif z is not None:
+                if z in range(source.z.start, source.z.stop): render_source = True
                 _x = (
                     source.x
                     if source.x.stop > source.x.start + 1
@@ -199,15 +207,17 @@ def visualize(
                     if source.y.stop > source.y.start + 1
                     else slice(source.y.start, source.y.start)
                 )
-            patch = ptc.Rectangle(
-                xy=(_y.start - 0.5, _x.start - 0.5),
-                width=_y.stop - _y.start,
-                height=_x.stop - _x.start,
-                linewidth=0,
-                edgecolor="none",
-                facecolor=srccolor,
-            )
-            plt.gca().add_patch(patch)
+
+            if render_source:
+                patch = ptc.Rectangle(
+                    xy=(_y.start - 0.5, _x.start - 0.5),
+                    width=_y.stop - _y.start,
+                    height=_x.stop - _x.start,
+                    linewidth=3,
+                    edgecolor=srccolor,
+                    facecolor=srccolor,
+                )
+                plt.gca().add_patch(patch)
 
     # Detector
     for detector in grid.detectors:
